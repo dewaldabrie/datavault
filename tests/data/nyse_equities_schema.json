@@ -1,0 +1,6 @@
+[
+    {"fieldname": "ISIN", "description": "International Securities Identification Number", "python_type": "str", "database_type": "String"},
+    {"fieldname": "Name", "description": "Name of the equity", "python_type": "str", "database_type": "String"},
+    {"fieldname": "Price", "description": "Price per share", "python_type": "float", "database_type": "Float"},
+    {"fieldname": "Currency", "description": "Currency of the price", "python_type": "str", "database_type": "String"}
+]
