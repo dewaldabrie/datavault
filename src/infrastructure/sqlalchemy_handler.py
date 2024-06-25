@@ -26,23 +26,9 @@ class SQLAlchemyHandler(DatabaseHandler):
     def extend_column_length(self, table_name: str, column_name: str, new_length: int):
         with self.engine.connect() as connection:
             connection.execute(f'ALTER TABLE {table_name} ALTER COLUMN {column_name} TYPE VARCHAR({new_length})')
-            # Drop and recreate foreign keys to avoid constraint violations
             table = Table(table_name, self.metadata, autoload_with=self.engine)
             column = table.columns[column_name]
             if column.foreign_keys:
                 for fk in column.foreign_keys:
                     connection.execute(f'ALTER TABLE {table_name} DROP CONSTRAINT {fk.constraint.name}')
                     connection.execute(f'ALTER TABLE {table_name} ADD CONSTRAINT {fk.constraint.name} FOREIGN KEY ({column.name}) REFERENCES {fk.column.table.name} ({fk.column.name})')
-
-    def create_table(self, name: str, schema: List[Dict[str, Any]]) -> Table:
-        columns = [Column('load_ts', DateTime, default=datetime.utcnow),
-                   Column('row_number_in_file', Integer, primary_key=True)]
-        for field in schema:
-            columns.append(Column(field['fieldname'], getattr(__import__('sqlalchemy'), field['database_type'])))
-        table = Table(name, self.metadata, *columns, extend_existing=True)
-        table.create(self.engine)
-        return table
-
-    def insert_data(self, table: Table, data: List[Dict[str, Any]]):
-        with self.engine.connect() as connection:
-            connection.execute(table.insert(), data)

@@ -1,9 +1,9 @@
 import hashlib
 from typing import List, Dict, Any
-from src.infrastructure.sqlalchemy_handler import SQLAlchemyHandler
+from src.domain.interfaces import DatabaseHandler
 
 class DataVaultDataInsertion:
-    def __init__(self, db_handler: SQLAlchemyHandler):
+    def __init__(self, db_handler: DatabaseHandler):
         self.db_handler = db_handler
 
     def calculate_hash(self, value: str) -> str:

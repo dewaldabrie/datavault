@@ -13,5 +13,3 @@ def test_landing_data(csv_path, schema_path, table_name):
     db_url = f"postgresql://postgres:{os.getenv('DB_PASSWORD')}@localhost/postgres"
     process_landing_data(csv_path, schema_path, db_url, table_name)
     # Additional assertions to verify data integrity in the database can be added here
-
-# Note: Replace 'username', 'password', and 'testdb' with actual database credentials

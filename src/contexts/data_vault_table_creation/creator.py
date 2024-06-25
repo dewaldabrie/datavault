@@ -1,10 +1,10 @@
 from sqlalchemy import Column, String, DateTime, JSON, ForeignKey
 from datetime import datetime
 from typing import List, Dict, Any
-from src.infrastructure.sqlalchemy_handler import SQLAlchemyHandler
+from src.domain.interfaces import DatabaseHandler
 
 class DataVaultTableCreation:
-    def __init__(self, db_handler: SQLAlchemyHandler):
+    def __init__(self, db_handler: DatabaseHandler):
         self.db_handler = db_handler
 
     def create_hub(self, hub_name: str, business_key: str):

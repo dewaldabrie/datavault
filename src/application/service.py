@@ -1,9 +1,13 @@
 from src.infrastructure.sqlalchemy_handler import SQLAlchemyHandler
-from src.data_vault_table_creation import DataVaultTableCreation
-from src.data_vault_data_insertion import DataVaultDataInsertion
+from src.contexts.data_vault_table_creation.creator import DataVaultTableCreation
+from src.contexts.data_vault_data_insertion.inserter import DataVaultDataInsertion
+from datetime import datetime
+from sqlalchemy import String
 
 # Initialize handlers
 db_handler = SQLAlchemyHandler(database_url="your_database_url")
+
+# Dependency injection
 table_creator = DataVaultTableCreation(db_handler)
 data_inserter = DataVaultDataInsertion(db_handler)
 
