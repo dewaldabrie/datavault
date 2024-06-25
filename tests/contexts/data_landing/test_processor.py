@@ -1,3 +1,4 @@
+import os
 import pytest
 from src.infrastructure.csv_reader import CSVReader
 from src.infrastructure.sqlalchemy_handler import SQLAlchemyHandler
