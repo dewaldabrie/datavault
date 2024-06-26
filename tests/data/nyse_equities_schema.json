@@ -1,6 +1,6 @@
 [
-    {"fieldname": "ISIN", "description": "International Securities Identification Number", "python_type": "str", "database_type": "String"},
-    {"fieldname": "Name", "description": "Name of the equity", "python_type": "str", "database_type": "String"},
-    {"fieldname": "Price", "description": "Price per share", "python_type": "float", "database_type": "Float"},
-    {"fieldname": "Currency", "description": "Currency of the price", "python_type": "str", "database_type": "String"}
+    {"fieldname": "ISIN", "description": "International Securities Identification Number", "python_type": "str", "db_type": "String", "db_col_length": 12},
+    {"fieldname": "Name", "description": "Name of the equity", "python_type": "str", "db_type": "String", "db_col_length": 50},
+    {"fieldname": "Price", "description": "Price per share", "python_type": "float", "db_type": "Float", "db_col_length": 10},
+    {"fieldname": "Currency", "description": "Currency of the price", "python_type": "str", "db_type": "String", "db_col_length": 3}
 ]

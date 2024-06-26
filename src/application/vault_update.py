@@ -4,10 +4,10 @@ from src.contexts.data_vault_data_insertion.inserter import DataVaultDataInserti
 from src.contexts.data_vault_table_creation.domain.models import HubSchema, SatelliteSchema, LinkSchema, ColumnSchema
 from src.contexts.data_vault_data_insertion.domain.models import HubData, SatelliteData, LinkData
 from datetime import datetime
-from sqlalchemy import String
+from src.application.config import DB_URL
 
 # Initialize handlers
-db_handler = SQLAlchemyHandler(database_url="your_database_url")
+db_handler = SQLAlchemyHandler(database_url=DB_URL)
 
 # Dependency injection
 table_creator = DataVaultTableCreation(db_handler)
@@ -23,14 +23,14 @@ table_creator.create_satelite(sat_schema)
 link_schema = LinkSchema(
     link_name="instrument_same_as_link",
     hub_names=["instrument_hub"],
-    additional_columns=[ColumnSchema(name="alternative_business_key", type=String(50))]
+    additional_columns=[ColumnSchema(name="alternative_business_key", type=str, type_length=100)]
 )
 table_creator.create_link(link_schema)
 
 link_schema = LinkSchema(
     link_name="instrument_hierarchical_link",
     hub_names=["parent_hub", "child_hub"],
-    additional_columns=[ColumnSchema(name="relationship_type", type=String(50))]
+    additional_columns=[ColumnSchema(name="relationship_type", type=str, type_length=100)]
 )
 table_creator.create_link(link_schema)
 

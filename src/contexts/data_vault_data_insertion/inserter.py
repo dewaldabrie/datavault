@@ -14,7 +14,7 @@ class DataVaultDataInsertion:
     def insert_hub_data(self, hub_name: str, data: List[HubData]):
         for record in data:
             record.hub_hash = self.calculate_hash(record.business_key)
-        self.db_handler.insert_data(hub_name, [record.dict() for record in data])
+        self.db_handler.insert_data(hub_name, [record.dict() for record in data], exists_ok=True)
 
     def insert_satelite_data(self, sat_name: str, data: List[SatelliteData]):
         for record in data:

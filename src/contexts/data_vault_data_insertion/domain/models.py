@@ -16,7 +16,8 @@ class SatelliteData(BaseModel):
     hash_diff: str = None
 
 class LinkData(BaseModel):
-    link_hash: str
+    # link_hash is not passed in but rather computed as the hash of the tuple of hub_hashes
     created_ts: datetime
     record_source: str
     hub_hashes: List[str]
+    link_hash: str = None

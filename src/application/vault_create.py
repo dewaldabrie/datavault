@@ -3,9 +3,10 @@ from src.contexts.data_vault_table_creation.creator import DataVaultTableCreatio
 from src.contexts.data_vault_table_creation.domain.models import HubSchema, SatelliteSchema, LinkSchema, ColumnSchema
 from datetime import datetime
 from sqlalchemy import String
+from src.application.config import DB_URL
 
 # Initialize handlers
-db_handler = SQLAlchemyHandler(database_url="your_database_url")
+db_handler = SQLAlchemyHandler(database_url=DB_URL)
 
 # Dependency injection
 table_creator = DataVaultTableCreation(db_handler)

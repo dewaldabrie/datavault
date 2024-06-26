@@ -1,8 +1,8 @@
 [
-    {"fieldname": "ISIN", "description": "International Securities Identification Number for the option", "python_type": "str", "database_type": "String"},
-    {"fieldname": "UnderlyingISIN", "description": "ISIN of the underlying equity", "python_type": "str", "database_type": "String"},
-    {"fieldname": "OptionType", "description": "Type of option (CALL or PUT)", "python_type": "str", "database_type": "String"},
-    {"fieldname": "StrikePrice", "description": "Strike price of the option", "python_type": "float", "database_type": "Float"},
-    {"fieldname": "ExpirationDate", "description": "Expiration date of the option", "python_type": "str", "database_type": "String"},
-    {"fieldname": "Currency", "description": "Currency of the strike price", "python_type": "str", "database_type": "String"}
+    {"fieldname": "ISIN", "description": "International Securities Identification Number for the option", "python_type": "str", "db_type": "String", "db_col_length": 12},
+    {"fieldname": "UnderlyingISIN", "description": "ISIN of the underlying equity", "python_type": "str", "db_type": "String", "db_col_length": 12},
+    {"fieldname": "OptionType", "description": "Type of option (CALL or PUT)", "python_type": "str", "db_type": "String", "db_col_length": 4},
+    {"fieldname": "StrikePrice", "description": "Strike price of the option", "python_type": "float", "db_type": "Float", "db_col_length": 10},
+    {"fieldname": "ExpirationDate", "description": "Expiration date of the option", "python_type": "str", "db_type": "String", "db_col_length": 10},
+    {"fieldname": "Currency", "description": "Currency of the strike price", "python_type": "str", "db_type": "String", "db_col_length": 3}
 ]
