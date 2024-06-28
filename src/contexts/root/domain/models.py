@@ -1,16 +1,6 @@
 from typing import Any, List
 from pydantic import BaseModel
 
-class FieldSchema(BaseModel):
-    fieldname: str
-    python_type: str
-    db_type: str
-    db_col_length: int
-    description: str
-
-class DataSchema(BaseModel):
-    fields: List[FieldSchema]
-
 
 class ColumnSchema(BaseModel):
     name: str

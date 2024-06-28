@@ -1,4 +1,4 @@
-from src.domain.interfaces import FileReader, DatabaseHandler
+from src.contexts.root.domain.interfaces import FileReader, DatabaseHandler
 from src.contexts.data_landing.domain.models import DataSchema, create_record_model
 from src.contexts.root.domain.models import FieldSchema, ColumnSchema
 from typing import List

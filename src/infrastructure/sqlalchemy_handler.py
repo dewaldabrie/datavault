@@ -1,7 +1,7 @@
 from sqlalchemy import create_engine, Table, Column, MetaData, Integer, String, DateTime, inspect, and_
 from sqlalchemy.dialects.postgresql import JSON
 from datetime import datetime
-from src.domain.interfaces import DatabaseHandler
+from src.contexts.root.domain.interfaces import DatabaseHandler
 from src.contexts.root.domain.models import ColumnSchema
 from typing import Any, Dict, List
 

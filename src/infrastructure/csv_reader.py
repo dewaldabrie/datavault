@@ -1,7 +1,7 @@
 import csv
 import json
 from typing import Any, Dict, List
-from src.domain.interfaces import FileReader
+from src.contexts.root.domain.interfaces import FileReader
 
 class CSVReader(FileReader):
     def read_schema(self, path: str) -> List[Dict[str, Any]]:

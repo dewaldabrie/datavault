@@ -14,6 +14,13 @@ class HubSchema(BaseModel):
         ColumnSchema(name='record_source', type=str, type_length=500)
     ])
 
+class HubData(BaseModel):
+    business_key: str
+    created_ts: datetime
+    record_source: str
+    hub_hash: str = None
+
+
 class SatelliteSchema(BaseModel):
     sat_name: str
     hub_name: str
@@ -25,6 +32,15 @@ class SatelliteSchema(BaseModel):
         ColumnSchema(name='hash_diff', type=str, type_length=HASH_LENGTH)
     ])
 
+
+class SatelliteData(BaseModel):
+    hub_hash: str
+    created_ts: datetime
+    record_source: str
+    attributes: Dict[str, Any]
+    hash_diff: str = None
+
+
 class LinkSchema(BaseModel):
     link_name: str
     hub_names: List[str]
@@ -34,3 +50,11 @@ class LinkSchema(BaseModel):
         ColumnSchema(name='created_ts', type=datetime, default=datetime.utcnow),
         ColumnSchema(name='record_source', type=str, type_length=500)
     ])
+    
+
+class LinkData(BaseModel):
+    # link_hash is not passed in but rather computed as the hash of the tuple of hub_hashes
+    created_ts: datetime
+    record_source: str
+    hub_hashes: List[str]
+    link_hash: str = None
