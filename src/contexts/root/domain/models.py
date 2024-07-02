@@ -1,8 +1,9 @@
-from typing import Any, List
-from pydantic import BaseModel
+from dataclasses import dataclass, field
+from typing import Any
 
 
-class ColumnSchema(BaseModel):
+@dataclass
+class ColumnSchema:
     name: str
     type: Any
     primary_key: bool = False

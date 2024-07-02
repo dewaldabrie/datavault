@@ -1,5 +1,6 @@
-from typing import List
-from src.contexts.root.domain.interfaces import DatabaseHandler
+import dataclasses
+from typing import List, Dict, Any
+from src.contexts.data_vault.domain.interfaces import DatabaseHandler
 from src.contexts.data_vault.domain.interfaces import DataVaultHandler
 from src.contexts.data_vault.domain.models import LinkSchema, LinkData
 from src.contexts.root.domain.models import ColumnSchema
@@ -20,7 +21,10 @@ class LinkHandler(DataVaultHandler):
     def populate(self, table_name: str, data: List[LinkData]):
         for record in data:
             record.link_hash = hashlib.md5((record.record_source + str(record.created_ts)).encode('utf-8')).hexdigest()
-        self.db_handler.insert_data(table_name, [record.dict() for record in data])
+        self.db_handler.insert_data(table_name, [dataclasses.asdict(record) for record in data])
 
     def resize_hash_key(self, table_name: str, new_length: int):
         self.db_handler.extend_column_length(table_name, 'link_hash', new_length)
+
+    def insert_data_from_staging(self, target_table: str, staging_table: str, select_columns: List[str], transformations: Dict[str, Any]):
+        self.db_handler.insert_data_from_staging(target_table, staging_table, select_columns, transformations)
