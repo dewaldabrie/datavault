@@ -18,7 +18,7 @@ class SQLAlchemyHandler(LandingDatabseHandler, VaultDatabaseHandler):
         dict: JSON # detect Postgres, else fall back to string
     }
     def __init__(self, database_url: str):
-        self.engine = create_engine(database_url, isolation_level="AUTOCOMMIT")
+        self.engine = create_engine(database_url)
         self.metadata = MetaData()
 
     def _get_infra_column_from_domain_column_schema(self, column_schema: ColumnSchema) -> Column:
@@ -39,17 +39,19 @@ class SQLAlchemyHandler(LandingDatabseHandler, VaultDatabaseHandler):
     def drop_table_if_exists(self, name: str):
         if inspect(self.engine).has_table(name):
             table = Table(name, self.metadata, autoload_with=self.engine)
-            table.drop(self.engine)
+            with self.engine.connect() as connection:
+                table.drop(connection)
+                connection.commit()
     
     def create_table(self, table_name: str, columns: List[ColumnSchema], drop_existing: bool = False):
         # drop table if exists
-        if drop_existing and inspect(self.engine).has_table(table_name):
-            self.drop_table_if_exists(table_name)
-        # create table if not exists
-        if not inspect(self.engine).has_table(table_name):
-            table = Table(table_name, self.metadata, *[self._get_infra_column_from_domain_column_schema(column) for column in columns], extend_existing=True)
-            table.create(self.engine)
-            return table
+            if drop_existing:
+                self.drop_table_if_exists(table_name)
+            # create table if not exists
+            if not inspect(self.engine).has_table(table_name):
+                table = Table(table_name, self.metadata, *[self._get_infra_column_from_domain_column_schema(column) for column in columns], extend_existing=True)
+                table.create(self.engine)
+                return table
 
     def insert_data(self, table_name: str, data: List[Dict[str, Any]], exists_ok: bool = False):
         table = Table(table_name, self.metadata, autoload_with=self.engine)

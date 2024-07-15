@@ -4,7 +4,6 @@ from src.contexts.data_vault.domain.interfaces import DatabaseHandler
 from src.contexts.data_vault.domain.models import SatelliteSchema
 from src.contexts.data_vault.domain.models import SatelliteData
 from src.contexts.data_vault.domain.interfaces import DataVaultHandler
-from src.infrastructure.mappers import map_satellite_schema_to_infra
 import hashlib
 
 

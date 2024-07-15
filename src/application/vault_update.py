@@ -52,7 +52,7 @@ sat_data = [
 satellite_handler.populate("instrument_satelite", sat_data)
 
 link_data = [
-    LinkData(link_hash="link1", created_ts=datetime.utcnow(), record_source="source1", hub_hashes=["hash1", "hash2"]),
+    LinkData(link_hash="link1", created_ts=datetime.utcnow(), record_source="source1", hub_hashes={"parent_hub": "hash1", "child_hub": "hash2"}),
     # ... more data ...
 ]
 link_handler.populate("instrument_same_as_link", link_data)

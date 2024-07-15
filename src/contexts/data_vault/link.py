@@ -19,9 +19,16 @@ class LinkHandler(DataVaultHandler):
         self.db_handler.create_table(schema.link_name, schema.columns, drop_existing)
 
     def populate(self, table_name: str, data: List[LinkData]):
+        record_dicts = []
         for record in data:
             record.link_hash = hashlib.md5((record.record_source + str(record.created_ts)).encode('utf-8')).hexdigest()
-        self.db_handler.insert_data(table_name, [dataclasses.asdict(record) for record in data])
+            d = dataclasses.asdict(record)
+            # translate LinkData to LinkSchema
+            hub_hashes = d.pop('hub_hashes')
+            for hub_name, hub_hash_key in hub_hashes.items():
+                d[f'{hub_name}_hash'] = hub_hash_key
+            record_dicts.append(d)
+        self.db_handler.insert_data(table_name, record_dicts)
 
     def resize_hash_key(self, table_name: str, new_length: int):
         self.db_handler.extend_column_length(table_name, 'link_hash', new_length)

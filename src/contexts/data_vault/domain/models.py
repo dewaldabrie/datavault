@@ -10,7 +10,7 @@ class HubSchema:
     hub_name: str
     business_key: ColumnSchema = field(default_factory=lambda: ColumnSchema(name='business_key', type=str, type_length=100))
     columns: List[ColumnSchema] = field(default_factory=lambda: [
-        ColumnSchema(name='hub_hash', type=str, primary_key=True, type_length=HASH_LENGTH),
+        ColumnSchema(name='hub_hash', type=str, primary_key=True, type_length=HASH_LENGTH, nullable=False, unique=True),
         ColumnSchema(name='created_ts', type=datetime, default=datetime.utcnow),
         ColumnSchema(name='record_source', type=str, type_length=500)
     ])
@@ -27,7 +27,7 @@ class SatelliteSchema:
     sat_name: str
     hub_name: str
     columns: List[ColumnSchema] = field(default_factory=lambda: [
-        ColumnSchema(name='hub_hash', type=str, primary_key=True, foreign_key='', type_length=HASH_LENGTH),
+        ColumnSchema(name='hub_hash', type=str, primary_key=True, foreign_key='', type_length=HASH_LENGTH, nullable=False, unique=True),
         ColumnSchema(name='created_ts', type=datetime, primary_key=True, default=datetime.utcnow),
         ColumnSchema(name='record_source', type=str, type_length=500),
         ColumnSchema(name='attributes', type=dict),
@@ -48,7 +48,7 @@ class LinkSchema:
     hub_names: List[str]
     additional_columns: List[ColumnSchema] = field(default_factory=list)
     columns: List[ColumnSchema] = field(default_factory=lambda: [
-        ColumnSchema(name='link_hash', type=str, primary_key=True, type_length=HASH_LENGTH),
+        ColumnSchema(name='link_hash', type=str, primary_key=True, type_length=HASH_LENGTH, nullable=False, unique=True),
         ColumnSchema(name='created_ts', type=datetime, default=datetime.utcnow),
         ColumnSchema(name='record_source', type=str, type_length=500)
     ])
@@ -57,5 +57,5 @@ class LinkSchema:
 class LinkData:
     created_ts: datetime
     record_source: str
-    hub_hashes: List[str]
+    hub_hashes: Dict[str, str]  # key: hub_name, val: hub_hash_key
     link_hash: str = None

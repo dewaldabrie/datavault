@@ -2,6 +2,8 @@ from sqlmodel import SQLModel, Field
 from typing import Any, Optional, List
 from datetime import datetime
 
+# I think we don't need the rest ...
+
 class ColumnSchema(SQLModel, table=False):
     name: str = Field(primary_key=True)
     type: str

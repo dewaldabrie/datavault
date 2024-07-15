@@ -1,6 +1,6 @@
 import datetime
 import pytest
-from src.infrastructure.sqlalchemy_handler import SQLAlchemyHandler
+from src.infrastructure.sqlmodel_handler import SQLModelHandler
 from src.contexts.data_vault.hub import HubHandler
 from src.contexts.data_vault.satellite import SatelliteHandler
 from src.contexts.data_vault.link import LinkHandler
@@ -9,7 +9,7 @@ from src.application.config import DB_URL
 
 @pytest.fixture
 def db_handler():
-    return SQLAlchemyHandler(database_url=DB_URL)
+    return SQLModelHandler(database_url=DB_URL)
 
 @pytest.fixture
 def hub_handler(db_handler):
@@ -76,7 +76,7 @@ def test_insert_data_from_staging(db_handler):
         ColumnSchema(name="business_key", type=str, type_length=100),
         ColumnSchema(name="created_ts", type=datetime.datetime),
         ColumnSchema(name="record_source", type=str, type_length=500),
-        ColumnSchema(name="hub_hash", type=str, type_length=32)
+        ColumnSchema(name="hub_hash", type=str, type_length=32, primary_key=True)
     ], drop_existing=True)
 
     db_handler.insert_data_from_staging(
@@ -89,7 +89,7 @@ def test_insert_data_from_staging(db_handler):
     # Add assertions to verify data insertion
     from sqlalchemy import text
     with db_handler.engine.connect() as connection:
-        result = connection.execute(text('SELECT * FROM "HubData"')).fetchall()
+        result = connection.execute(text('SELECT * FROM hubdata')).fetchall()
     assert len(result) > 0
     hub_hash_idx = -1
     assert result[0][hub_hash_idx] is not None
