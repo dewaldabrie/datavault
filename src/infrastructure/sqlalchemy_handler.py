@@ -1,7 +1,6 @@
-from sqlalchemy import create_engine, Table, Column, MetaData, Integer, String, DateTime, inspect, and_
+from sqlalchemy import create_engine, Table, Column, UniqueConstraint, MetaData, Integer, String, DateTime, inspect, and_
 from sqlalchemy.dialects import oracle, postgresql
 from sqlalchemy.dialects.postgresql import JSON
-from sqlalchemy import func
 from sqlalchemy import select, insert
 from datetime import datetime
 from src.contexts.data_landing.domain.interfaces import DatabaseHandler as LandingDatabseHandler
@@ -43,13 +42,19 @@ class SQLAlchemyHandler(LandingDatabseHandler, VaultDatabaseHandler):
                 table.drop(connection)
                 connection.commit()
     
-    def create_table(self, table_name: str, columns: List[ColumnSchema], drop_existing: bool = False):
+    def create_table(self, table_name: str, columns: List[ColumnSchema], drop_existing: bool = False, unique_together: List[str] | None = None):
         # drop table if exists
             if drop_existing:
                 self.drop_table_if_exists(table_name)
             # create table if not exists
             if not inspect(self.engine).has_table(table_name):
-                table = Table(table_name, self.metadata, *[self._get_infra_column_from_domain_column_schema(column) for column in columns], extend_existing=True)
+                table = Table(
+                    table_name, 
+                    self.metadata, 
+                    *[self._get_infra_column_from_domain_column_schema(column) for column in columns] \
+                        + ([UniqueConstraint(*unique_together, name='unique_together_' + '_'.join(unique_together))] if unique_together else []),
+                    extend_existing=True
+                )
                 table.create(self.engine)
                 return table
 

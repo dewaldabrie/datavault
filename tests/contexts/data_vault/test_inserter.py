@@ -4,7 +4,7 @@ from src.infrastructure.sqlalchemy_handler import SQLAlchemyHandler
 from src.contexts.data_vault.hub import HubHandler
 from src.contexts.data_vault.satellite import SatelliteHandler
 from src.contexts.data_vault.link import LinkHandler
-from src.contexts.data_vault.domain.models import HubSchema as DomainHubSchema, LinkSchema as DomainLinkSchema, SatelliteSchema as DomainSatelliteSchema, ColumnSchema, HubData, SatelliteData, LinkData
+from src.contexts.data_vault.domain.models import HubSchema as DomainHubSchema, LinkSchema as DomainLinkSchema, SatelliteSchema as DomainSatelliteSchema, ColumnSchema, HubData, DocumentSatelliteData, LinkData
 from src.application.config import DB_URL
 
 @pytest.fixture
@@ -38,7 +38,7 @@ def test_insert_satelite_data(satellite_handler, hub_handler):
     sat_schema = DomainSatelliteSchema(sat_name="test_satelite", hub_name="test_hub")
     satellite_handler.create(sat_schema, drop_existing=True)
     sat_data = [
-        SatelliteData(hub_hash="hash1", created_ts=datetime.datetime.now(datetime.UTC), record_source="source1", attributes={"attr1": "value1"}),
+        DocumentSatelliteData(hub_hash_key="hash1", created_ts=datetime.datetime.now(datetime.UTC), record_source="source1", attributes={"attr1": "value1"}),
         # ... more data ...
     ]
     satellite_handler.populate("test_satelite", sat_data)

@@ -1,80 +1,103 @@
-from src.infrastructure.sqlalchemy_handler import SQLAlchemyHandler
-from src.contexts.root.common import HASH_FUNCTION
+import datetime
+from src.infrastructure.sqlmodel_handler import SQLModelHandler
 from src.contexts.data_vault.hub import HubHandler
 from src.contexts.data_vault.satellite import SatelliteHandler
 from src.contexts.data_vault.link import LinkHandler
-from src.contexts.data_vault.domain.models import HubSchema as DomainHubSchema, SatelliteSchema as DomainSatelliteSchema, LinkSchema as DomainLinkSchema, ColumnSchema, HubData, SatelliteData, LinkData
-from src.infrastructure.mappers import map_hub_schema_to_infra, map_satellite_schema_to_infra, map_link_schema_to_infra
+from src.contexts.data_vault.domain.models import HubData, XDomainHubData, DocumentSatelliteData, LinkData
 from datetime import datetime
 from src.application.config import DB_URL
 
 
 # Initialize handlers
-db_handler = SQLAlchemyHandler(database_url=DB_URL)
+db_handler = SQLModelHandler(database_url=DB_URL)
 
 # Dependency injection
 hub_handler = HubHandler(db_handler)
 satellite_handler = SatelliteHandler(db_handler)
 link_handler = LinkHandler(db_handler)
 
-# Create tables
-hub_schema = DomainHubSchema(hub_name="instrument_hub")
-hub_handler.create(map_hub_schema_to_infra(hub_schema))
 
-sat_schema = DomainSatelliteSchema(sat_name="instrument_satelite", hub_name="instrument_hub")
-satellite_handler.create(map_satellite_schema_to_infra(sat_schema))
 
-link_schema = DomainLinkSchema(
-    link_name="instrument_same_as_link",
-    hub_names=["instrument_hub"],
-    additional_columns=[ColumnSchema(name="alternative_business_key", type=str, type_length=100)]
-)
-link_handler.create(map_link_schema_to_infra(link_schema))
-
-link_schema = DomainLinkSchema(
-    link_name="instrument_hierarchical_link",
-    hub_names=["parent_hub", "child_hub"],
-    additional_columns=[ColumnSchema(name="relationship_type", type=str, type_length=100)]
-)
-link_handler.create(map_link_schema_to_infra(link_schema))
 
 # Insert data
 hub_data = [
-    HubData(business_key="key1", created_ts=datetime.utcnow(), record_source="source1"),
-    # ... more data ...
+    HubData(business_key="quote_id", created_ts=datetime.utcnow(), record_source="masterdata"),
+    HubData(business_key="ric", created_ts=datetime.utcnow(), record_source="masterdata"),
+    HubData(business_key="aaa_numeric_code", created_ts=datetime.utcnow(), record_source="masterdata"),
+    HubData(business_key="bloomberg_global_id", created_ts=datetime.utcnow(), record_source="masterdata"),
 ]
-hub_handler.populate("instrument_hub", hub_data)
+hub_handler.populate("hub_sym_fam", hub_data)
 
-sat_data = [
-    SatelliteData(hub_hash="hash1", created_ts=datetime.utcnow(), record_source="source1", attributes={"attr1": "value1"}),
-    # ... more data ...
+hub_data = [
+    XDomainHubData(business_key="ABC399L24.AAA", created_ts=datetime.utcnow(), record_source="DSP"),
+    XDomainHubData(business_key="ABC.AAA", created_ts=datetime.utcnow(), record_source="DSP"),
+    XDomainHubData(business_key="abc.aaa_", created_ts=datetime.utcnow(), record_source="BBGBO"),
 ]
-satellite_handler.populate("instrument_satelite", sat_data)
+hub_handler.populate("hub_ins_symbol", hub_data)
 
 link_data = [
-    LinkData(link_hash="link1", created_ts=datetime.utcnow(), record_source="source1", hub_hashes={"parent_hub": "hash1", "child_hub": "hash2"}),
-    # ... more data ...
+    LinkData(created_ts=datetime.utcnow(), record_source="DSP", hub_hashes={"hub_sym_fam": "hash2", "hub_ins_symbol": "hash3"}),
 ]
-link_handler.populate("instrument_same_as_link", link_data)
+link_handler.populate("link_ins_sameas", link_data)
+
+hub_data = [
+    XDomainHubData(business_key="eq111", created_ts=datetime.utcnow(), record_source="DSP"),
+    XDomainHubData(business_key="opt222", created_ts=datetime.utcnow(), record_source="DSP"),
+    XDomainHubData(business_key="111eq", created_ts=datetime.utcnow(), record_source="BBGBO"),
+]
+hub_handler.populate("hub_ins", hub_data)
+
+
+
+sat_dsp_opt_data = [
+    DocumentSatelliteData(hub_hash="hash1", created_ts=datetime.utcnow(), record_source="DSP", attributes={"quote_id": "opt222", "exchange": "AAA", "underlying": "eq111", "ticker": "abc", "contract_size": 100, "strike": 399, "opt_type": "call", "exp_date": datetime.datetime(2024,12,31)}),
+]
+satellite_handler.populate("instrument_satelite", sat_dsp_opt_data)
+
+sat_dsp_eq_data = [
+    DocumentSatelliteData(hub_hash="hash2", created_ts=datetime.utcnow(), record_source="DSP", attributes={"quote_id": "eq111", "exchange": "AAA", "ticker": "abc"}),
+]
+satellite_handler.populate("instrument_satelite", sat_dsp_eq_data)
+
+sat_bbgbo_eq_data = [
+    DocumentSatelliteData(hub_hash="hash3", created_ts=datetime.utcnow(), record_source="BBGBO", attributes={"quote_id": "111eq", "exchange": "aaa_", "ticker": "abc"}),
+]
+satellite_handler.populate("instrument_satelite", sat_bbgbo_eq_data)
+
+
+link_data = [
+    # TODO: how to add data for addtional columns like "relationship_type" via LinkData model?
+    LinkData(link_hash="link0", created_ts=datetime.utcnow(), record_source="DSP", hub_hashes={"hub_ins": "hash2", "hub_ins": "hash3"}),
+]
+link_handler.populate("link_ins_sameas", link_data)
+
+
+
+
+link_data = [
+    # TODO: how to add data for addtional columns like "relationship_type" via LinkData model?
+    LinkData(link_hash="link1", created_ts=datetime.utcnow(), record_source="arbitrator", hub_hashes={"hub_ins": "hash2", "hub_ins": "hash3"}),
+]
+link_handler.populate("link_ins_sameas", link_data)
 
 # Populate from staging
-db_handler.insert_data_from_staging(
-    target_table="HubData",
-    staging_table="staging_hub_table",
-    select_columns=['business_key', 'created_ts', 'record_source'],
-    transformations={'hub_hash': (HASH_FUNCTION, ['business_key'])}
-)
+# db_handler.insert_data_from_staging(
+#     target_table="HubData",
+#     staging_table="staging_hub_table",
+#     select_columns=['business_key', 'created_ts', 'record_source'],
+#     transformations={'hub_hash': (HASH_KEY_FUNCTION, ['business_key'])}
+# )
 
-db_handler.insert_data_from_staging(
-    target_table="SatelliteData",
-    staging_table="staging_satellite_table",
-    select_columns=['hub_hash', 'created_ts', 'record_source', 'attributes'],
-    transformations={'hash_diff': (HASH_FUNCTION, ['attributes'])}
-)
+# db_handler.insert_data_from_staging(
+#     target_table="DocumentSatelliteData",
+#     staging_table="staging_satellite_table",
+#     select_columns=['hub_hash', 'created_ts', 'record_source', 'attributes'],
+#     transformations={'hash_diff': (HASH_KEY_FUNCTION, ['attributes'])}
+# )
 
-db_handler.insert_data_from_staging(
-    target_table="LinkData",
-    staging_table="staging_link_table",
-    select_columns=['created_ts', 'record_source', 'hub_hashes'],
-    transformations={'link_hash': (HASH_FUNCTION, ['record_source', 'created_ts'])}
-)
+# db_handler.insert_data_from_staging(
+#     target_table="LinkData",
+#     staging_table="staging_link_table",
+#     select_columns=['created_ts', 'record_source', 'hub_hashes'],
+#     transformations={'link_hash': (HASH_KEY_FUNCTION, ['record_source', 'created_ts'])}
+# )

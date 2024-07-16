@@ -12,7 +12,7 @@ from src.contexts.root.domain.models import ColumnSchema
 from typing import Any, Dict, List
 from src.contexts.root.common import HASH_LENGTH
 
-from sqlmodel import SQLModel, Field
+from sqlmodel import SQLModel, Field, UniqueConstraint
 from typing import List, Type
 from src.contexts.data_vault.domain.models import HubSchema
 
@@ -34,7 +34,7 @@ class SQLModelHandler(LandingDatabseHandler, VaultDatabaseHandler):
         self.engine = create_engine(database_url)
         self.metadata = SQLModel.metadata
     
-    def _create_sqlmodel_class(self, name: str, base: Type[SQLModel], columns: List[ColumnSchema], create_table=True) -> Type[SQLModel]:
+    def _create_sqlmodel_class(self, name: str, base: Type[SQLModel], columns: List[ColumnSchema], create_table=True, unique_together: List[str] | None = None) -> Type[SQLModel]:
         attributes = {}
         annotations = {}
         dialect = self.engine.dialect.name
@@ -65,11 +65,14 @@ class SQLModelHandler(LandingDatabseHandler, VaultDatabaseHandler):
             annotations[col.name] = col.type
         
         attributes['__annotations__'] = annotations
+
+        if unique_together:
+            attributes['__table_args__'] = (UniqueConstraint(*unique_together, name='unique_together_' + '_'.join(unique_together)),)
         
         return types.new_class(name, (base,), {'table': create_table}, lambda ns: ns.update(attributes))
 
     
-    def create_table(self, table_name: str, schema: List[ColumnSchema], drop_existing: bool = False) -> None:
+    def create_table(self, table_name: str, schema: List[ColumnSchema], drop_existing: bool = False, unique_together: List[str] | None = None) -> None:
         
         if drop_existing:
             try:
@@ -87,7 +90,8 @@ class SQLModelHandler(LandingDatabseHandler, VaultDatabaseHandler):
         sql_model_class = self._create_sqlmodel_class(
             name=table_name,
             base=SQLModel,
-            columns=schema
+            columns=schema,
+            unique_together=unique_together
         )
         SQLModel.metadata.create_all(self.engine, tables=[sql_model_class.__table__], checkfirst=True)
 
